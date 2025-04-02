@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-service # names the ingress resource
+  annotations: # adds custom behaviour for ingress
+    nginx.ingress.kubernetes.io/use-regex: "true" # enabling regex for paths
+spec:
+  ingressClassName: nginx
+  rules: # defines the traffic routing rules
+    - host: ticketing.dev # routing traffic for the domain
+      http:
+        paths:
+          - path: /api/users/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: auth-srv # traffic is sent to the service name provided by
+                port:
+                  number: 3000
