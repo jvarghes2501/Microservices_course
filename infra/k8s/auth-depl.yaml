@@ -15,6 +15,12 @@ spec:
       containers: # list the container(s) that will run inside the pod
         - name: auth #assigns name to the container
           image: jestinV/auth #specifies the docker image to use for this container
+          env:
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
 ---
 apiVersion: v1
 kind: Service # defines how to expose the deployment (pods) to allow communication
