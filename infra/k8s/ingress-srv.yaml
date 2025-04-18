@@ -1,19 +1,41 @@
+# kubernetes ingress resource is used to route HTTP traffic to different
+# services within the cluster based on the URL path and host
+
+# ingress is smart router for kubernates cluster
+# defines rules to route exteneral http(s) request to internal services (auth-srv and client-srv)
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-service # names the ingress resource
-  annotations: # adds custom behaviour for ingress
-    nginx.ingress.kubernetes.io/use-regex: "true" # enabling regex for paths
+  name: ingress-service
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   ingressClassName: nginx
-  rules: # defines the traffic routing rules
-    - host: ticketing.dev # routing traffic for the domain
+  rules: # applies rules only if request is for the given host
+    - host: ticketing.dev
       http:
-        paths:
+        paths: # if url path starts with /api/users traffic is routed to service: auth-srv on given port
           - path: /api/users/?(.*)
             pathType: ImplementationSpecific
             backend:
               service:
-                name: auth-srv # traffic is sent to the service name provided by
+                name: auth-srv
                 port:
                   number: 3000
+          - path: /?(.*) # catch all route and route it to the client-srv on the given port
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: client-srv
+                port:
+                  number: 3000
+#Example Request URL | Routed To
+#http://ticketing.dev/ | client-srv
+#http://ticketing.dev/contact | client-srv
+#http://ticketing.dev/api/users | auth-srv
+#http://ticketing.dev/api/users/1 | auth-srv
+
+# Notes:
+# need to run NGINX ingress controller in the cluster
+# DNS for ticketing.dev should be configured to point to the cluser
+# edit the /etc/hosts file to route the traffic coming to ticketing.dev locally

@@ -1,36 +1,39 @@
-apiVersion: apps/v1 # specifies the API version used for deployment
-kind: Deployment # this is a deployment resource
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: auth-depl # assign the name to deployment resource
+  name: auth-depl # deployment named this
 spec:
-  replicas: 1 # specified one pod of the application should run
-  selector:
+  replicas: 1 # one instance of the app will run
+  selector: # deployment will manage pods with the label app: auth
     matchLabels:
-      app: auth #match pods with the label to identify which pods are managed by this deployment
-  template: # specififies how the pods will be created
+      app: auth
+  template: # defines the pod template. label and selector matches so deployment can manage them
     metadata:
-      labels: # adds label to the pod
+      labels:
         app: auth
-    spec:
-      containers: # list the container(s) that will run inside the pod
-        - name: auth #assigns name to the container
-          image: jestinV/auth #specifies the docker image to use for this container
-          env:
-            - name: JWT_KEY
+    spec: # runs container named auth from docker image rallycoding/auth
+      containers:
+        - name: auth
+          image: rallycoding/auth
+          env: # injects an environment variable into the container
+            - name: JWT_KEY # variable name
               valueFrom:
-                secretKeyRef:
+                secretKeyRef: # value is pulled from kubernetes secret with the given name
                   name: jwt-secret
                   key: JWT_KEY
 ---
-apiVersion: v1
-kind: Service # defines how to expose the deployment (pods) to allow communication
+apiVersion: v1 # exposes the auth app for communication with other pods in the cluster
+kind: Service
 metadata:
-  name: auth-srv # assign the name to the service
-spec:
+  name: auth-srv
+spec: # service looks for pods with label app:auth
   selector:
-    app: auth # targets pod with the label to identify which pods to route traffic to
+    app: auth
   ports:
-    - name: auth # names port definition
-      protocol: TCP # specified that TCP used for communication
-      port: 3000 # exposes the service on port
-      targetPort: 3000 # routes traffic to port 3000 on target pod
+    - name: auth
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+## SUMMARY
+# deployment (auth-depl) - ensures auth app is running in a pod,
+# service(auth-serv) - exposes pods inside the cluster so other services can communicate it on port 3000

@@ -1,18 +1,29 @@
-apiVersion: skaffold/v2alpha3
-kind: Config # specifies the file is a skaffold configuration
-deploy:
-  kubectl: # specifies the kubernates command line tool that will be used (kubectl) for deployment
-    manifests:
-      - ./infra/k8s/* # skaffold will look for files in this directory
-build: # build configuration for building the container
-  local: # specifies the build will be local
-    push: false # specified the image will not be pushed to docker hub (local developement and testing)
-  artifacts: # defines the details for building container
-    - image: jestinV/auth # name of the docker image to build
-      context: ./auth # specifies the directory where the source code for the auth service resides
+# skaffold config file which is used to automate the workflow for building
+# pushing and deploting applications to kubernates
+# skaffold watches changes in the source code and when there is a change:
+# builds the docker image, pushes them to registry, deploys to kubernates
+apiVersion: skaffold/v4beta3
+kind: Config
+manifests: # tells skaffold to apply all the kubernates YAML files in this directory
+  rawYaml:
+    - ./infra/k8s/*
+build: # builds the image locally and does not push to remote registy (for local developement)
+  local:
+    push: false
+  artifacts: # tells how to build each service
+    - image: rallycoding/auth # builds this docker image
+      context: auth # looks in this folder for source code
       docker:
-        dockerfile: Dockerfile # points to the dockerfile for building the image
-      sync: #Configures file synchronization for hot reloading during development.
-        manual: # specified manual file synchronization rules
-          - src: "src/**/*.ts" # Matches all  files in the  directory (and its subdirectories)
-            dest: . # synchronizes matched files to root directory of the container
+        dockerfile: Dockerfile # uses the docker file inside that folder
+      sync: # tells skaffold if file in the src path changes, sync it to the container
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: rallycoding/ticketing-client
+      context: client
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "**/*.js"
+            dest: .

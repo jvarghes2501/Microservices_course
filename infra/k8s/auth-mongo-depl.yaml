@@ -7,25 +7,28 @@ spec:
   selector:
     matchLabels:
       app: auth-mongo
-
   template:
     metadata:
       labels:
         app: auth-mongo
-    spec:
+    spec: # defines conatiner inside the pod named auth-mongo
       containers:
         - name: auth-mongo
-          image: mongo
+          image: mongo # runs mongo image from docker hub (starts a MongoDb server)
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: auth-mongo-srv
-spec:
+spec: # service will route traffic to any pod with label app:auth-mongo
   selector:
     app: auth-mongo
-  ports:
+  ports: # uses the mongodb's default port to route traffic
     - name: db
       protocol: TCP
       port: 27017
       targetPort: 27017
+## Summary
+# deployment(auth-mongo-depl) - runs MongoDb in a container inside a pod
+# service (auth-mongo-srv) - exposes mongoDb pod to other services inside the cluster
+
