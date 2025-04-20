@@ -1,8 +1,7 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import { User } from "../models/user";
-import { BadRequestError } from "../errors/bad-request-error";
-import { validateRequest } from "../middlewares/validate-request";
+import { validateRequest, BadRequestError } from "@jvctickets/common";
 import jwt from "jsonwebtoken"; // to install run: npm install jsonwebtoken @types/jsonwebtoken
 const router = express.Router();
 
