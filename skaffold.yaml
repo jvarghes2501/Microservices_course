@@ -19,6 +19,22 @@ build: # builds the image locally and does not push to remote registy (for local
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: rallycoding/tickets # builds this docker image
+      context: tickets # looks in this folder for source code
+      docker:
+        dockerfile: Dockerfile # uses the docker file inside that folder
+      sync: # tells skaffold if file in the src path changes, sync it to the container
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: rallycoding/orders # builds this docker image
+      context: orders # looks in this folder for source code
+      docker:
+        dockerfile: Dockerfile # uses the docker file inside that folder
+      sync: # tells skaffold if file in the src path changes, sync it to the container
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
     - image: rallycoding/ticketing-client
       context: client
       docker:

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-depl # deployment named this
+spec:
+  replicas: 1 # one instance of the app will run
+  selector: # deployment will manage pods with the label app: auth
+    matchLabels:
+      app: orders
+  template: # defines the pod template. label and selector matches so deployment can manage them
+    metadata:
+      labels:
+        app: orders
+    spec: # runs container named tickets from docker image rallycoding/auth
+      containers:
+        - name: orders
+          image: rallycoding/orders
+          env: # injects an environment variable into the container
+            - name: MONGO_URI
+              value: "mongodb://orders-mongo-srv:27017/orders"
+            - name: JWT_KEY # variable name
+              valueFrom:
+                secretKeyRef: # value is pulled from kubernetes secret with the given name
+                  name: jwt-secret
+                  key: JWT_KEY
+            - name: NATS_URL
+              value: "http://nats-srv:4222"
+            - name: NATS_CLUSTER_ID
+              value: ticketing
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+---
+apiVersion: v1 # exposes the tickets app for communication with other pods in the cluster
+kind: Service
+metadata:
+  name: orders-srv
+spec: # service looks for pods with label app:tickets
+  selector:
+    app: orders
+  ports:
+    - name: orders
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+## SUMMARY
+# deployment (orders-depl) - ensures tickets app is running in a pod,
+# service(orders-serv) - exposes pods inside the cluster so other services can communicate it on port 3000

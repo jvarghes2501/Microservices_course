@@ -16,6 +16,8 @@ spec:
         - name: auth
           image: rallycoding/auth
           env: # injects an environment variable into the container
+            - name: MONGO_URI
+              value: "mongodb://auth-mongo-srv:27017/auth"
             - name: JWT_KEY # variable name
               valueFrom:
                 secretKeyRef: # value is pulled from kubernetes secret with the given name
