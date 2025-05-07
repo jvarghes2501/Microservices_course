@@ -8,6 +8,7 @@ it("fetches the order", async () => {
   const ticket = Ticket.build({
     title: "concert",
     price: 20,
+    id: "abc",
   });
   await ticket.save();
   const user = await signin();
@@ -33,6 +34,7 @@ it("returns an error if a user tries to fetch order of another", async () => {
   const ticket = Ticket.build({
     title: "concert",
     price: 20,
+    id: "abc",
   });
   await ticket.save();
   const user = await signin();

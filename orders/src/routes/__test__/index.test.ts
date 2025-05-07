@@ -3,23 +3,27 @@ import { app } from "../../app";
 import { Order } from "../../models/order";
 import { Ticket } from "../../models/ticket";
 import { signin } from "../../test/signin";
+import mongoose from "mongoose";
 it("fetches orders for a particular user", async () => {
   //create three tickets
   const ticket1 = Ticket.build({
     title: "concert2",
     price: 10,
+    id: new mongoose.Types.ObjectId().toHexString(),
   });
   await ticket1.save();
 
   const ticket2 = Ticket.build({
     title: "concert2",
     price: 20,
+    id: new mongoose.Types.ObjectId().toHexString(),
   });
   await ticket2.save();
 
   const ticket3 = Ticket.build({
     title: "concert3",
     price: 30,
+    id: new mongoose.Types.ObjectId().toHexString(),
   });
   await ticket3.save();
 
