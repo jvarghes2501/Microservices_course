@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expiration-depl # deployment named this
+spec:
+  replicas: 1 # one instance of the app will run
+  selector: # deployment will manage pods with the label app: auth
+    matchLabels:
+      app: expiration
+  template: # defines the pod template. label and selector matches so deployment can manage them
+    metadata:
+      labels:
+        app: expiration
+    spec: # runs container named expiration from docker image rallycoding/auth
+      containers:
+        - name: expiration
+          image: rallycoding/expiration
+          env: # injects an environment variable into the container
+            - name: NATS_URL
+              value: "http://nats-srv:4222"
+            - name: NATS_CLUSTER_ID
+              value: ticketing
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: REDIS_HOST
+              value: expiration-redis-srv
+## SUMMARY
+# deployment (expiration-depl) - ensures tickets app is running in a pod
