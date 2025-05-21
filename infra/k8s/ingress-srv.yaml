@@ -36,6 +36,13 @@ spec:
                 name: orders-srv
                 port:
                   number: 3000
+          - path: /api/payments/?(.*) # catch all route and route it to the payments-srv on the given port
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: payments-srv
+                port:
+                  number: 3000
           - path: /?(.*) # catch all route and route it to the client-srv on the given port
             pathType: ImplementationSpecific
             backend:

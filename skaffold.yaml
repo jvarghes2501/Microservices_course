@@ -51,3 +51,11 @@ build: # builds the image locally and does not push to remote registy (for local
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: rallycoding/payments # builds this docker image
+      context: payments # looks in this folder for source code
+      docker:
+        dockerfile: Dockerfile # uses the docker file inside that folder
+      sync: # tells skaffold if file in the src path changes, sync it to the container
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
